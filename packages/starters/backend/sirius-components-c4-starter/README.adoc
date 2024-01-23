@@ -1,0 +1,58 @@
+= sirius-components-c4-starter
+
+== Purpose
+
+This module provides a prototype sample Sirius Web modeler for the [C4 model](https://c4model.com/).
+
+== Notes and Future Work
+
+=== C4 Model
+
+* Dependency to the C4 metamodel is hard-coded for now (see jars in 'dependencies/'). Probably we need to set up the [metamodel repository](https://github.com/ObeoNetwork/C4Model) to publish its resulting artefacts somewhere we can add as dependency.
+* We should set up custom icons for C4 elements
+
+=== Representations
+
+* Only the first C4 diagram "System Context" is implemented for now.
+
+==== System Context Diagram
+
+* There are no tools/palettes for this diagram.
+* Sirius Web does not yet support edges with 'straight' routing style so edges for 'ContextInteraction' are routed tree-like.
+* Sirius Web does not yet support specifying nodes with image styles with the label inside it, so for 'ExternalPerson' the label is outside the node. Moreover it does not support specifying the side of the node on which the label appears, or moving it, so the label is always below the node itself.
+
+==== Container Diagram (TODO)
+
+Target: the SystemContainerization of the C4Model
+
+Nodes:
+* ExternalPerson & ExternalSystem just like in the 'System Context Diagram'
+* SoftwareSystem as a light container
+* ContainerizationElements as nodes inside the SoftwareSystem
+
+Edges:
+* ContainerizationInteractions as edges between the ContainerizationInteractables
+
+==== Component Diagram (TODO)
+
+Target: any ContainerComponentization
+Note that upon creation of a ContainerComponentization, the focused ContainerizationElement should be specified.
+
+Nodes:
+* The target ContainerizationElement as a light container
+* Its contained ComponentizationElements inside the container, as their own nodes (usual style)
+* Other ContainerizationElements appear outside the container
+
+Edges:
+* ComponentizationInteractions as edges between the ComponentizationInteractables
+
+==== Code Diagram (TODO)
+
+This section is a little bit less formalized in the C4 model specification.
+Here we take the approach that the 'code resources' we may want to represent in the C4 model are accessible through a URL (i.e. an existing Javadoc page, UML diagram, etc.).
+
+Target: any ComponentRefinement
+Upon creation we want to specify which ComponentizationElement is concerned.
+
+Nodes:
+* Each contained ComponentClue is a node. It hyperlinks to the specified URL.
