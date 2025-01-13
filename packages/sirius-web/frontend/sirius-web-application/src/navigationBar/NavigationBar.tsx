@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021, 2024 Obeo.
+ * Copyright (c) 2021, 2025 Obeo.
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -16,18 +16,19 @@ import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
-import { emphasize } from '@mui/material/styles';
+import { emphasize, Theme } from '@mui/material/styles';
 import { Link as RouterLink } from 'react-router-dom';
 import { makeStyles } from 'tss-react/mui';
-import { NavigationBarProps } from './NavigationBar.types';
+import { SiriusIcon } from '../core/SiriusIcon';
+import { NavigationBarHomeProps, NavigationBarProps } from './NavigationBar.types';
 import {
-  navigationBarIconExtensionPoint,
+  navigationBarHomeExtensionPoint,
   navigationBarLeftContributionExtensionPoint,
   navigationBarRightContributionExtensionPoint,
 } from './NavigationBarExtensionPoints';
 import { NavigationBarMenu } from './NavigationBarMenu';
 
-const useNavigationBarStyles = makeStyles()((theme) => ({
+const useNavigationBarStyles = makeStyles()((theme: Theme) => ({
   navbar: {
     display: 'flex',
     flexDirection: 'column',
@@ -66,10 +67,24 @@ const useNavigationBarStyles = makeStyles()((theme) => ({
   },
 }));
 
+export const SiriusWebNavigationBarHome: React.ComponentType<NavigationBarHomeProps> = ({}: NavigationBarHomeProps) => {
+  const { classes } = useNavigationBarStyles();
+
+  return (
+    <Tooltip title="Back to the homepage2">
+      <Link component={RouterLink} to="/" className={classes.link} color="inherit">
+        <IconButton className={classes.onDarkBackground} color="inherit">
+          <SiriusIcon fontSize="large" />
+        </IconButton>
+      </Link>
+    </Tooltip>
+  );
+};
+
 export const NavigationBar = ({ children }: NavigationBarProps) => {
   const { classes } = useNavigationBarStyles();
 
-  const { Component: Icon } = useComponent(navigationBarIconExtensionPoint);
+  const { Component: NavigationBarHome } = useComponent(navigationBarHomeExtensionPoint);
 
   const leftContributions = useComponents(navigationBarLeftContributionExtensionPoint);
   const rightContributions = useComponents(navigationBarRightContributionExtensionPoint);
@@ -80,13 +95,7 @@ export const NavigationBar = ({ children }: NavigationBarProps) => {
       <AppBar position="static">
         <Toolbar className={classes.toolbar} variant="dense">
           <div className={classes.left}>
-            <Tooltip title="Back to the homepage">
-              <Link component={RouterLink} to="/" className={classes.link} color="inherit">
-                <IconButton className={classes.onDarkBackground} color="inherit">
-                  <Icon />
-                </IconButton>
-              </Link>
-            </Tooltip>
+            <NavigationBarHome />
             {leftContributions.map(({ Component: LeftContribution }, index) => (
               <LeftContribution key={index} />
             ))}

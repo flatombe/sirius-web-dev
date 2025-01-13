@@ -11,19 +11,23 @@
 - Add loading indicators for long actions
 - Add impact analysis before tool execution
 - Add support for artifact publication from a project
-
+- Support custom navigation bar
 
 === Architectural decision records
 
 - [ADR-178] Add support of actions in table row menu
 - [ADR-179] Add support for artifact publication from a project
 - [ADR-180] Add support for widget diagnostics provider in View-based Forms
+- [ADR-181] Make Navigation Bar extension point more flexible
 
 === Deprecation warning
 
 
 === Breaking changes
 
+- https://github.com/eclipse-sirius/sirius-web/issues/4404[#4404] [sirius-web] The `navigationBarIconExtensionPoint` extension point has been removed.
+Use the new `navigationBarHomeExtensionPoint` instead which allows the contribution of an arbitrary React component instead of just an Icon.
+See `SiriusWebNavigationBarHome` in module `NavigationBar` for the default implementation, which can be used as an example implementation for your own application.
 
 === Dependency update
 
