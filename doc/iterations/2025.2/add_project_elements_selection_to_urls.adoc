@@ -1,0 +1,72 @@
+= (M) Add project elements selection to URLs
+
+== Problem
+
+Currently, Sirius Web has URLs for projects `+https://example.org/projects/project-id/edit+` and their representations `+https://example.org/projects/project-id/edit/representation-id+`.
+But there are no URLs that can be used to designate project elements (models and/or semantic elements).
+This possibility would be useful for documentation and collaboration purposes.
+
+== Key Result
+
+End users shall be able to create links that include a selection of project elements.
+
+=== Acceptance Criteria
+
+- End users can easily obtain an URL from their current selection of project elements in the workbench.
+- When resolving a URL that specifies a selection, all graphical project elements from the selection automatically get selected in all available sections of the workbench (notably in the _Explorer_ view, and possibly in the specified representation).
+
+== Solution
+
+- The current URL will change based on the selection made in the workbench.
+  The URL will be updated to include the identifier of the selected project elements.
+  In particular, it is possible for a project element to occur several times in the selection (e.g. semantic elements may be represented by several different graphical elements in a representation).
+  In that case, its identifier also appears several times in the resulting URL.
+- The identifiers are stored in the URL in parameter _selection_.
+- The order of the project element identifiers in the URL reflect the order of the project elements in the selection.
+- Reversely, upon resolving a URL that specifies a selection of project elements, all graphical project elements available in the workbench that represent the given project elements get selected.
+  In particular, this means there can be a lot of graphical project elements that end up selected, because representations may include any number of graphical elements to represent a single semantic element.
+
+=== Scenario 1 : Obtaining the URL from a workbench selection
+
+- The end user is in a project but no representation is opened.
+  The URL looks like: `+https://example.org/projects/project-id/edit+`.
+
+- The end user selects some elements of the project.
+  This can be done through the _Explorer_ view, or through any other part of the workbench that displays project elements, such as the _Related Elements_ view.
+
+- The selected elements can be models or semantic elements.
+  They cannot be representations or their graphical elements, because selecting a representation in the workbench opens it (thus changing the URL), and graphical elements can only be selected through the representation editor that requires opening a representation.
+
+- Upon selecting an element in the workbench, its corresponding project element (model or semantic element) is retrieved in order to obtain its identifier, e.g. `+id_1+`.
+- The URL gets updated automatically in order to reflect the selection change, into: `+https://example.org/projects/project-id/edit?selection=id_1+`.
+- Upon selecting another element in the workbench, its corresponding project element identifier is retrieved and added to the selection parameter, which means the URL is updated to either `+https://example.org/projects/project-id/edit?selection=id_1&id_2+` or `+https://example.org/projects/project-id/edit?selection=id_1&id_1+`
+
+=== Scenario 2 : Resolution of a URL containing the selection parameter
+
+- The URL path, whether it is a project or representation URL, is resolved as usual.
+  This means the specified project is opened, and if a representation is specified, it is opened in the representation editor.
+
+- The identifiers specified in the _selection_ parameter of the URL query are retrieved.
+  Based on these identifiers, we are able to retrieve the project elements that are meant to be selected.
+
+- The workbench selection is set to those elements.
+  Each section of the workbench defines how it reacts to its selection being set.
+  TODO: actually not sure how selection in Sirius Web is done. Is there a common API we can call?
+
+- TODO: not sure if the Sirius Web workbench has a 'reveal' API or if each section might have one. The idea is that we not only set the selection programmatically, but also reveal it (e.g. so that the diagram editor adapts the zoom level to make all elements visible).
+
+=== Breadboarding
+
+N/A
+
+=== Cutting backs
+
+- We could decide to only support the selection of semantic elements, and not support the selection of models inside a project.
+
+== Rabbit holes
+
+- TODO: I think we can end up in a situation where after setting the workbench selection programmatically, the URL changes as a result of the sections reacting to the selection change. Is this OK? We also have to make sure we do not flicker between both.
+
+== No-gos
+
+N/A

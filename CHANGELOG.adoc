@@ -11,6 +11,7 @@
 - Add loading indicators for long actions
 - Add impact analysis before tool execution
 - Add support for artifact publication from a project
+- Add project elements selection to URLs
 
 
 === Architectural decision records
