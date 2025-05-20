@@ -12,6 +12,7 @@
  *******************************************************************************/
 package org.eclipse.sirius.web.application.project.controllers;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.eclipse.sirius.web.application.project.services.api.IProjectExportService;
@@ -68,6 +69,7 @@ public class ProjectDownloadController {
                     .build();
 
             HttpHeaders headers = new HttpHeaders();
+            headers.setAccessControlExposeHeaders(List.of(HttpHeaders.CONTENT_DISPOSITION));
             headers.setContentDisposition(contentDisposition);
             headers.setContentType(MediaType.parseMediaType("application/zip"));
             headers.setContentLength(content.length);

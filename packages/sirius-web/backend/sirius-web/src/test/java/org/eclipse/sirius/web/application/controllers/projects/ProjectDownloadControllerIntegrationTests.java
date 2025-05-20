@@ -221,6 +221,7 @@ public class ProjectDownloadControllerIntegrationTests extends AbstractIntegrati
 
         var response = new TestRestTemplate().exchange(uri, HttpMethod.GET, entity, Resource.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getHeaders().getAccessControlExposeHeaders()).contains(HttpHeaders.CONTENT_DISPOSITION);
 
         return response;
     }
