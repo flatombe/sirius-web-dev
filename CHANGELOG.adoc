@@ -5,7 +5,7 @@
 === Shapes
 
 - Control the views available in a workbench
-
+- Encode the workbench state in the URL.
 
 === Architectural decision records
 
