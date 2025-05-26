@@ -77,6 +77,7 @@ const useWorkbenchStyles = makeStyles()(() => ({
 
 export const Workbench = ({
   editingContextId,
+  initialRepresentationsOpened,
   initialRepresentationSelected,
   onRepresentationSelected,
   readOnly,
@@ -88,7 +89,7 @@ export const Workbench = ({
   >(workbenchMachine, {
     context: {
       displayedRepresentation: initialRepresentationSelected,
-      representations: initialRepresentationSelected ? [initialRepresentationSelected] : [],
+      representations: initialRepresentationsOpened,
     },
   });
   const { toast } = value as SchemaValue;

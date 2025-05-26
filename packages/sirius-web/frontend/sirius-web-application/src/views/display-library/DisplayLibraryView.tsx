@@ -55,6 +55,7 @@ export const DisplayLibraryView = () => {
             <DisplayLibraryNavbar library={data.viewer.library} />
             <Workbench
               editingContextId={data.viewer.library.currentEditingContext.id}
+              initialRepresentationsOpened={null}
               initialRepresentationSelected={null}
               onRepresentationSelected={null}
               readOnly

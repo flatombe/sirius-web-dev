@@ -29,7 +29,8 @@ export type SchemaValue = 'loading' | 'loaded' | 'missing';
 
 export interface EditProjectViewContext {
   project: GQLProject | null;
-  representation: RepresentationMetadata | null;
+  openedRepresentations: RepresentationMetadata[];
+  activeRepresentation: RepresentationMetadata | null;
   message: string | null;
 }
 
@@ -44,7 +45,8 @@ export const editProjectViewMachine = Machine<EditProjectViewContext, EditProjec
   {
     context: {
       project: null,
-      representation: null,
+      openedRepresentations: [],
+      activeRepresentation: null,
       message: null,
     },
     initial: 'loading',
@@ -101,8 +103,8 @@ export const editProjectViewMachine = Machine<EditProjectViewContext, EditProjec
         return { project, representation };
       }),
       selectRepresentation: assign((_, event) => {
-        const { representation } = event as SelectRepresentationEvent;
-        return { representation };
+        const { representation: activeRepresentation } = event as SelectRepresentationEvent;
+        return { activeRepresentation };
       }),
     },
   }

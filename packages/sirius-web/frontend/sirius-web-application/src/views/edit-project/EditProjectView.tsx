@@ -101,7 +101,7 @@ export const EditProjectView = () => {
     name,
     representationId,
     context.project?.id ?? null,
-    context.representation?.id ?? null,
+    context.activeRepresentation?.id ?? null,
     value !== 'loaded'
   );
 
@@ -124,8 +124,9 @@ export const EditProjectView = () => {
   }
 
   if (value === 'loaded' && context.project && context.project.currentEditingContext) {
-    const urlWorkbenchStateValue: string = urlSearchParams.get('workbenchState') ?? '';
-    const initialWorkbenchState: WorkbenchState = JSON.parse(urlWorkbenchStateValue);
+    const maybeUrlWorkbenchStateValue: string | null = urlSearchParams.get('workbenchState');
+    const initialWorkbenchState: WorkbenchState =
+      maybeUrlWorkbenchStateValue !== null ? JSON.parse(maybeUrlWorkbenchStateValue) : null;
 
     const urlSelectionValue: string = urlSearchParams.get('selection') ?? '';
     const selectionEntries: SelectionEntry[] =
@@ -146,7 +147,8 @@ export const EditProjectView = () => {
                       <TreeToolBarProvider>
                         <Workbench
                           editingContextId={context.project.currentEditingContext.id}
-                          initialRepresentationSelected={context.representation}
+                          initialRepresentationsOpened={context.openedRepresentations}
+                          initialRepresentationSelected={context.activeRepresentation}
                           onRepresentationSelected={onRepresentationSelected}
                           readOnly={readOnly}
                         />
