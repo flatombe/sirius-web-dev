@@ -24,5 +24,8 @@
   },
   "devDependencies": {
     "turbo": "2.4.4"
+  },
+  "dependencies": {
+    "@eclipse-sirius/sirius-components-core": "file:.yalc/@eclipse-sirius/sirius-components-core"
   }
 }
