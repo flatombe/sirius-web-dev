@@ -19,6 +19,8 @@ import {
   SelectionEntry,
   useData,
   Workbench,
+  WorkbenchState,
+  WorkbenchStateContextProvider,
 } from '@eclipse-sirius/sirius-components-core';
 import { OmniboxProvider } from '@eclipse-sirius/sirius-components-omnibox';
 import {
@@ -50,6 +52,7 @@ import { UploadDocumentModalContribution } from './TreeToolBarContributions/Uplo
 import { UndoRedo } from './UndoRedo';
 import { useProjectAndRepresentationMetadata } from './useProjectAndRepresentationMetadata';
 import { useSynchronizeSelectionAndURL } from './useSynchronizeSelectionAndURL';
+import { WorkbenchStateSynchronizer } from './WorkbenchStateSynchronizer';
 
 const PROJECT_ID_SEPARATOR = '@';
 
@@ -121,33 +124,40 @@ export const EditProjectView = () => {
   }
 
   if (value === 'loaded' && context.project && context.project.currentEditingContext) {
+    const urlWorkbenchStateValue: string = urlSearchParams.get('workbenchState') ?? '';
+    const initialWorkbenchState: WorkbenchState = JSON.parse(urlWorkbenchStateValue);
+
     const urlSelectionValue: string = urlSearchParams.get('selection') ?? '';
-    const entries: SelectionEntry[] =
+    const selectionEntries: SelectionEntry[] =
       urlSelectionValue.trim().length > 0 ? urlSelectionValue.split(',').map((id) => ({ id })) : [];
-    const initialSelection: Selection = { entries };
+    const initialSelection: Selection = { entries: selectionEntries };
 
     const readOnly = readOnlyPredicate(context.project);
     content = (
       <ProjectContext.Provider value={{ project: context.project }}>
-        <SelectionContextProvider initialSelection={initialSelection}>
-          <SelectionSynchronizer>
-            <RepresentationPathContext.Provider value={{ getRepresentationPath }}>
-              <OmniboxProvider editingContextId={context.project.currentEditingContext.id}>
-                <UndoRedo>
-                  <EditProjectNavbar readOnly={readOnly} />
-                  <TreeToolBarProvider>
-                    <Workbench
-                      editingContextId={context.project.currentEditingContext.id}
-                      initialRepresentationSelected={context.representation}
-                      onRepresentationSelected={onRepresentationSelected}
-                      readOnly={readOnly}
-                    />
-                  </TreeToolBarProvider>
-                </UndoRedo>
-              </OmniboxProvider>
-            </RepresentationPathContext.Provider>
-          </SelectionSynchronizer>
-        </SelectionContextProvider>
+        <WorkbenchStateContextProvider initialWorkbenchState={initialWorkbenchState}>
+          <WorkbenchStateSynchronizer>
+            <SelectionContextProvider initialSelection={initialSelection}>
+              <SelectionSynchronizer>
+                <RepresentationPathContext.Provider value={{ getRepresentationPath }}>
+                  <OmniboxProvider editingContextId={context.project.currentEditingContext.id}>
+                    <UndoRedo>
+                      <EditProjectNavbar readOnly={readOnly} />
+                      <TreeToolBarProvider>
+                        <Workbench
+                          editingContextId={context.project.currentEditingContext.id}
+                          initialRepresentationSelected={context.representation}
+                          onRepresentationSelected={onRepresentationSelected}
+                          readOnly={readOnly}
+                        />
+                      </TreeToolBarProvider>
+                    </UndoRedo>
+                  </OmniboxProvider>
+                </RepresentationPathContext.Provider>
+              </SelectionSynchronizer>
+            </SelectionContextProvider>
+          </WorkbenchStateSynchronizer>
+        </WorkbenchStateContextProvider>
       </ProjectContext.Provider>
     );
   }
