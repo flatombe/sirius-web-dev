@@ -12,7 +12,7 @@
  *******************************************************************************/
 
 import { gql, useQuery } from '@apollo/client';
-import { RepresentationComponentProps, useMultiToast } from '@eclipse-sirius/sirius-components-core';
+import { RepresentationComponentProps, useMultiToast, useWorkbenchState } from '@eclipse-sirius/sirius-components-core';
 import { ReactFlowProvider } from '@xyflow/react';
 import { memo, useEffect, useState } from 'react';
 import { DiagramContext } from '../contexts/DiagramContext';
@@ -66,11 +66,19 @@ export const getDiagramDescription = gql`
 `;
 
 export const DiagramRepresentation = memo(
-  ({ editingContextId, representationId, readOnly }: RepresentationComponentProps) => {
+  ({ editingContextId, representationId, readOnly, partId }: RepresentationComponentProps) => {
     const [state, setState] = useState<DiagramRepresentationState>({
       id: crypto.randomUUID(),
       message: null,
     });
+    const { workbenchState, updateWorkbenchPart } = useWorkbenchState();
+    useEffect(() => {
+      updateWorkbenchPart(partId);
+      return () => {
+        delete workbenchState.parts[partId];
+      };
+    }, [partId]);
+
     const { addErrorMessage } = useMultiToast();
 
     const {

@@ -58,12 +58,14 @@ export type WorkbenchProps = {
   initialRepresentationSelected: RepresentationMetadata | null;
   onRepresentationSelected: (representation: RepresentationMetadata | null) => void;
   readOnly: boolean;
+  partId: string;
 };
 
 export type RepresentationComponentProps = {
   editingContextId: string;
   representationId: string;
   readOnly: boolean;
+  partId: string;
 };
 
 export type RepresentationComponent = React.ComponentType<RepresentationComponentProps>;

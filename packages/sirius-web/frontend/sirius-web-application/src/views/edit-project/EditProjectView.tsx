@@ -151,6 +151,7 @@ export const EditProjectView = () => {
                           initialRepresentationSelected={context.activeRepresentation}
                           onRepresentationSelected={onRepresentationSelected}
                           readOnly={readOnly}
+                          partId="EditProjectView.Workbench"
                         />
                       </TreeToolBarProvider>
                     </UndoRedo>

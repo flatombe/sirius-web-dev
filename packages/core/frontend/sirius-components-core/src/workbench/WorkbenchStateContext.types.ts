@@ -11,20 +11,19 @@
  *     Obeo - initial API and implementation
  *******************************************************************************/
 export interface WorkbenchState {
-  parts: WorkbenchPart[];
+  parts: { [partId: string]: WorkbenchPart };
   configuration?: object;
   focus?: string;
 }
 
 export interface WorkbenchPart {
-  id: string;
-  parts: WorkbenchPart[];
   configuration?: object;
 }
 
 export interface WorkbenchStateContextValue {
   workbenchState: WorkbenchState;
   setWorkbenchState: (workbenchState: WorkbenchState) => void;
+  updateWorkbenchPart: (partId: string, updater?: (workbenchPart: WorkbenchPart) => void) => WorkbenchPart;
 }
 
 export interface WorkbenchStateContextProviderProps {

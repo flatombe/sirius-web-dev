@@ -23,6 +23,7 @@ import { useSelection } from '../selection/useSelection';
 import { Toast } from '../toast/Toast';
 import { Panels } from './Panels';
 import { RepresentationNavigation } from './RepresentationNavigation';
+import { useWorkbenchState } from './useWorkbenchState';
 import {
   GQLEditingContextEventSubscription,
   RepresentationComponentProps,
@@ -81,6 +82,7 @@ export const Workbench = ({
   initialRepresentationSelected,
   onRepresentationSelected,
   readOnly,
+  partId,
 }: WorkbenchProps) => {
   const { classes } = useWorkbenchStyles();
 
@@ -98,6 +100,14 @@ export const Workbench = ({
   const { data } = useRepresentationMetadata(editingContextId, selection);
 
   const { data: representationFactories } = useData(representationFactoryExtensionPoint);
+
+  const { workbenchState, setWorkbenchState, updateWorkbenchPart } = useWorkbenchState();
+  useEffect(() => {
+    updateWorkbenchPart(partId);
+    return () => {
+      delete workbenchState.parts[partId];
+    };
+  }, [partId]);
 
   const onData = ({ data }: OnDataOptions<GQLEditingContextEventSubscription>) => {
     flushSync(() => {
@@ -142,6 +152,11 @@ export const Workbench = ({
 
   const onRepresentationClick = (representation: RepresentationMetadata) => {
     setSelection({ entries: [{ id: representation.id }] });
+
+    setWorkbenchState({
+      ...workbenchState,
+      focus: displayedRepresentation?.id,
+    });
   };
 
   const onClose = (representation: RepresentationMetadata) => {
@@ -180,6 +195,7 @@ export const Workbench = ({
       editingContextId,
       readOnly,
       representationId: displayedRepresentation.id,
+      partId: displayedRepresentation.id, // TODO FLA: I think we might need to also encode the "label" of the factory?
     };
     if (RepresentationComponent) {
       main = (

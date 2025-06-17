@@ -11,9 +11,10 @@
  *     Obeo - initial API and implementation
  *******************************************************************************/
 
-import { WorkbenchState } from './WorkbenchStateContext.types';
+import { WorkbenchPart, WorkbenchState } from './WorkbenchStateContext.types';
 
 export interface UseWorkbenchStateValue {
   workbenchState: WorkbenchState;
   setWorkbenchState: (workbenchState: WorkbenchState) => void;
+  updateWorkbenchPart: (partId: string, updater?: (workbenchPart: WorkbenchPart) => void) => WorkbenchPart;
 }

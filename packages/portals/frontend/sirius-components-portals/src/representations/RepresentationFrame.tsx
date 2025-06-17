@@ -16,10 +16,10 @@ import {
   representationFactoryExtensionPoint,
   useData,
 } from '@eclipse-sirius/sirius-components-core';
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import { makeStyles } from 'tss-react/mui';
-import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import { RepresentationFrameProps } from './RepresentationFrame.types';
 
 const useFrameStyles = makeStyles()((theme) => ({
@@ -69,6 +69,7 @@ export const RepresentationFrame = ({
       editingContextId,
       representationId: representation.id,
       readOnly: portalMode === 'edit' || portalMode === 'read-only',
+      partId: representation.id,
     };
 
     return (

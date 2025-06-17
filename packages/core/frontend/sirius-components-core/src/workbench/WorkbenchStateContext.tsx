@@ -13,16 +13,20 @@
 
 import React, { useCallback, useState } from 'react';
 import {
+  WorkbenchPart,
   WorkbenchState,
   WorkbenchStateContextProviderProps,
   WorkbenchStateContextProviderState,
   WorkbenchStateContextValue,
 } from './WorkbenchStateContext.types';
 
-const defaultWorkbenchState: WorkbenchState = { parts: [], configuration: undefined, focus: undefined };
+const defaultWorkbenchState: WorkbenchState = { parts: {} };
 const defaultWorkbenchStateContextValue: WorkbenchStateContextValue = {
   workbenchState: defaultWorkbenchState,
   setWorkbenchState: () => {},
+  updateWorkbenchPart: () => {
+    return {};
+  },
 };
 
 export const WorkbenchStateContext = React.createContext<WorkbenchStateContextValue>(defaultWorkbenchStateContextValue);
@@ -39,8 +43,20 @@ export const WorkbenchStateContextProvider = ({
     setState((prevState) => ({ ...prevState, workbenchState }));
   }, []);
 
+  const updateWorkbenchPart: (partId: string, updater?: (workbenchPart: WorkbenchPart) => void) => WorkbenchPart =
+    useCallback((partId, updater) => {
+      const workbenchPart: WorkbenchPart = state.workbenchState.parts[partId] ?? {};
+      state.workbenchState.parts[partId] = workbenchPart;
+      if (updater) {
+        updater(workbenchPart);
+      }
+      setWorkbenchState(state.workbenchState);
+      return workbenchPart;
+    }, []);
+
   return (
-    <WorkbenchStateContext.Provider value={{ workbenchState: state.workbenchState, setWorkbenchState }}>
+    <WorkbenchStateContext.Provider
+      value={{ workbenchState: state.workbenchState, setWorkbenchState, updateWorkbenchPart }}>
       {children}
     </WorkbenchStateContext.Provider>
   );

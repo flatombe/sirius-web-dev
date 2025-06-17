@@ -16,6 +16,7 @@ import { UseWorkbenchStateValue } from './useWorkbenchState.types';
 import { WorkbenchStateContext } from './WorkbenchStateContext';
 
 export const useWorkbenchState = (): UseWorkbenchStateValue => {
-  const { workbenchState, setWorkbenchState } = useContext<UseWorkbenchStateValue>(WorkbenchStateContext);
-  return { workbenchState, setWorkbenchState };
+  const { workbenchState, setWorkbenchState, updateWorkbenchPart } =
+    useContext<UseWorkbenchStateValue>(WorkbenchStateContext);
+  return { workbenchState, setWorkbenchState, updateWorkbenchPart };
 };
