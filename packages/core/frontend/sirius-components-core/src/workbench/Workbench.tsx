@@ -101,7 +101,7 @@ export const Workbench = ({
 
   const { data: representationFactories } = useData(representationFactoryExtensionPoint);
 
-  const { workbenchState, setWorkbenchState, updateWorkbenchPart } = useWorkbenchState();
+  const { workbenchState, updateWorkbenchPart } = useWorkbenchState();
   useEffect(() => {
     updateWorkbenchPart(partId);
     return () => {
@@ -152,11 +152,6 @@ export const Workbench = ({
 
   const onRepresentationClick = (representation: RepresentationMetadata) => {
     setSelection({ entries: [{ id: representation.id }] });
-
-    setWorkbenchState({
-      ...workbenchState,
-      focus: displayedRepresentation?.id,
-    });
   };
 
   const onClose = (representation: RepresentationMetadata) => {
@@ -205,6 +200,7 @@ export const Workbench = ({
             displayedRepresentation={displayedRepresentation}
             onRepresentationClick={onRepresentationClick}
             onClose={onClose}
+            partId={displayedRepresentation.id} // RepresentationNavigation and RepresentationComponent are two sides of the same coin so they have the same partId.
           />
           <RepresentationComponent key={`${editingContextId}#${displayedRepresentation.id}`} {...props} />
         </div>

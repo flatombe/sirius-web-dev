@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021, 2024 Obeo.
+ * Copyright (c) 2025 Obeo.
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -10,12 +10,16 @@
  * Contributors:
  *     Obeo - initial API and implementation
  *******************************************************************************/
-import { RepresentationMetadata } from './Workbench.types';
 
-export type RepresentationNavigationProps = {
-  representations: RepresentationMetadata[];
-  displayedRepresentation: RepresentationMetadata;
-  onRepresentationClick: (representation: RepresentationMetadata) => void;
-  onClose: (representation: RepresentationMetadata) => void;
-  partId: string;
+export type DiagramRepresentationConfigurationContextValue = {
+  isHelperLinesEnabledInPartConfigurationContext: (partId: string) => boolean;
+  setHelperLinesEnabledInPartConfigurationContext: (partId: string, helperLinesEnabled: boolean) => void;
 };
+
+export interface DiagramRepresentationConfigurationContextProviderProps {
+  children: React.ReactNode;
+}
+
+export interface DiagramRepresentationConfiguration {
+  isHelperLinesEnabled: boolean;
+}

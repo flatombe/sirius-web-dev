@@ -31,7 +31,7 @@ export const WorkbenchStateSynchronizer = ({ children }: WorkbenchStateSynchroni
       if (workbenchState) {
         const workbenchStateValue: string = JSON.stringify(workbenchState);
         urlSearchParams.set('workbenchState', workbenchStateValue);
-        console.log('URL param "workbenchState updated to: ' + workbenchStateValue);
+        console.log('URL param "workbenchState updated to: ' + JSON.stringify(workbenchState, null, '\t'));
       } else {
         console.log('There is no workbenchState');
         if (urlSearchParams.has('workbenchState')) {

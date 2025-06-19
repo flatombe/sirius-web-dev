@@ -12,7 +12,7 @@
  *******************************************************************************/
 
 import { gql, useQuery } from '@apollo/client';
-import { RepresentationComponentProps, useMultiToast, useWorkbenchState } from '@eclipse-sirius/sirius-components-core';
+import { RepresentationComponentProps, useMultiToast } from '@eclipse-sirius/sirius-components-core';
 import { ReactFlowProvider } from '@xyflow/react';
 import { memo, useEffect, useState } from 'react';
 import { DiagramContext } from '../contexts/DiagramContext';
@@ -33,6 +33,7 @@ import {
   GQLDiagramDescriptionVariables,
 } from './DiagramRepresentation.types';
 import { DiagramSubscriptionProvider } from './DiagramSubscriptionProvider';
+import { DiagramRepresentationConfigurationContextProvider } from './configuration/DiagramRepresentationConfigurationContext';
 
 export const getDiagramDescription = gql`
   query getDiagramDescription($editingContextId: ID!, $representationId: ID!) {
@@ -71,13 +72,6 @@ export const DiagramRepresentation = memo(
       id: crypto.randomUUID(),
       message: null,
     });
-    const { workbenchState, updateWorkbenchPart } = useWorkbenchState();
-    useEffect(() => {
-      updateWorkbenchPart(partId);
-      return () => {
-        delete workbenchState.parts[partId];
-      };
-    }, [partId]);
 
     const { addErrorMessage } = useMultiToast();
 
@@ -118,36 +112,39 @@ export const DiagramRepresentation = memo(
 
     return (
       <ReactFlowProvider>
-        <DiagramDirectEditContextProvider>
-          <DiagramPaletteContextProvider>
-            <DiagramElementPaletteContextProvider>
-              <ConnectorContextProvider>
-                <DropNodeContextProvider>
-                  <NodeContextProvider>
-                    <MarkerDefinitions />
-                    <FullscreenContextProvider>
-                      <DiagramDescriptionContext.Provider value={{ diagramDescription }}>
-                        <DiagramContext.Provider
-                          value={{
-                            editingContextId,
-                            diagramId: representationId,
-                            readOnly,
-                          }}>
-                          <ManageVisibilityContextProvider>
-                            <DiagramSubscriptionProvider
-                              diagramId={representationId}
-                              editingContextId={editingContextId}
-                              readOnly={readOnly}></DiagramSubscriptionProvider>
-                          </ManageVisibilityContextProvider>
-                        </DiagramContext.Provider>
-                      </DiagramDescriptionContext.Provider>
-                    </FullscreenContextProvider>
-                  </NodeContextProvider>
-                </DropNodeContextProvider>
-              </ConnectorContextProvider>
-            </DiagramElementPaletteContextProvider>
-          </DiagramPaletteContextProvider>
-        </DiagramDirectEditContextProvider>
+        <DiagramRepresentationConfigurationContextProvider>
+          <DiagramDirectEditContextProvider>
+            <DiagramPaletteContextProvider>
+              <DiagramElementPaletteContextProvider>
+                <ConnectorContextProvider>
+                  <DropNodeContextProvider>
+                    <NodeContextProvider>
+                      <MarkerDefinitions />
+                      <FullscreenContextProvider>
+                        <DiagramDescriptionContext.Provider value={{ diagramDescription }}>
+                          <DiagramContext.Provider
+                            value={{
+                              editingContextId,
+                              diagramId: representationId,
+                              readOnly,
+                            }}>
+                            <ManageVisibilityContextProvider>
+                              <DiagramSubscriptionProvider
+                                diagramId={representationId}
+                                editingContextId={editingContextId}
+                                readOnly={readOnly}
+                                partId={partId}></DiagramSubscriptionProvider>
+                            </ManageVisibilityContextProvider>
+                          </DiagramContext.Provider>
+                        </DiagramDescriptionContext.Provider>
+                      </FullscreenContextProvider>
+                    </NodeContextProvider>
+                  </DropNodeContextProvider>
+                </ConnectorContextProvider>
+              </DiagramElementPaletteContextProvider>
+            </DiagramPaletteContextProvider>
+          </DiagramDirectEditContextProvider>
+        </DiagramRepresentationConfigurationContextProvider>
       </ReactFlowProvider>
     );
   }

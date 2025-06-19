@@ -22,6 +22,7 @@ import { DiagramNodeType } from './node/NodeTypes.types';
 
 export interface DiagramRendererProps {
   diagramRefreshedEventPayload: GQLDiagramRefreshedEventPayload;
+  partId: string;
 }
 
 export interface Diagram {

@@ -38,6 +38,7 @@ import { NodeTypeContext } from '../contexts/NodeContext';
 import { NodeTypeContextValue } from '../contexts/NodeContext.types';
 import { useDiagramDescription } from '../contexts/useDiagramDescription';
 import { convertDiagram } from '../converter/convertDiagram';
+import { useDiagramRepresentationConfiguration } from '../representation/configuration/useDiagramRepresentationConfiguration';
 import { useStore } from '../representation/useStore';
 import { Diagram, DiagramRendererProps, EdgeData, NodeData, ReactFlowPropsCustomizer } from './DiagramRenderer.types';
 import { diagramRendererReactFlowPropsCustomizerExtensionPoint } from './DiagramRendererExtensionPoints';
@@ -82,12 +83,14 @@ import { useSnapToGrid } from './snap-to-grid/useSnapToGrid';
 
 const GRID_STEP: number = 10;
 
-export const DiagramRenderer = memo(({ diagramRefreshedEventPayload }: DiagramRendererProps) => {
+export const DiagramRenderer = memo(({ diagramRefreshedEventPayload, partId }: DiagramRendererProps) => {
   const { readOnly } = useContext<DiagramContextValue>(DiagramContext);
   const { diagramDescription } = useDiagramDescription();
   const { getEdges, onEdgesChange, getNodes, setEdges, setNodes } = useStore();
   const nodes = getNodes();
   const edges = getEdges();
+  const { isHelperLinesEnabledInPartConfiguration, setHelperLinesEnabledInPartConfiguration } =
+    useDiagramRepresentationConfiguration(partId);
 
   const { onDirectEdit } = useDiagramDirectEdit();
   const { onDelete } = useDiagramDelete();
@@ -274,12 +277,18 @@ export const DiagramRenderer = memo(({ diagramRefreshedEventPayload }: DiagramRe
   const { filterReadOnlyChanges } = useFilterReadOnlyChanges();
   const {
     helperLinesEnabled,
-    setHelperLinesEnabled,
+    setHelperLinesEnabled: setHelperLinesEnabledInUi,
     horizontalHelperLine,
     verticalHelperLine,
     applyHelperLines,
     resetHelperLines,
-  } = useHelperLines();
+  } = useHelperLines(isHelperLinesEnabledInPartConfiguration());
+
+  // Ensures consistency between the UI and the part configuration in the workbench state
+  const setHelperLinesEnabled: (helperLinesEnabled: boolean) => void = (helperLinesEnabled: boolean) => {
+    setHelperLinesEnabledInUi(helperLinesEnabled);
+    setHelperLinesEnabledInPartConfiguration(helperLinesEnabled);
+  };
 
   const handleNodesChange: OnNodesChange<Node<NodeData>> = useCallback(
     (changes: NodeChange<Node<NodeData>>[]) => {

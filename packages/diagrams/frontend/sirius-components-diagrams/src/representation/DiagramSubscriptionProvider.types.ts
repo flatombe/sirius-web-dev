@@ -28,4 +28,5 @@ export interface DiagramSubscriptionProviderProps {
   editingContextId: string;
   diagramId: string;
   readOnly: boolean;
+  partId: string;
 }

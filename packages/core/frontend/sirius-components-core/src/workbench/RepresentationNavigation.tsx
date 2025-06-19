@@ -13,10 +13,12 @@
 import CloseIcon from '@mui/icons-material/Close';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
+import { useEffect } from 'react';
 import { makeStyles } from 'tss-react/mui';
 import { IconOverlay } from '../icon/IconOverlay';
 import { RepresentationNavigationProps } from './RepresentationNavigation.types';
 import { RepresentationMetadata } from './Workbench.types';
+import { useWorkbenchState } from './useWorkbenchState';
 
 const useRepresentationNavigationStyles = makeStyles()((theme) => ({
   tabsRoot: {
@@ -60,8 +62,17 @@ export const RepresentationNavigation = ({
   displayedRepresentation,
   onRepresentationClick,
   onClose,
+  partId,
 }: RepresentationNavigationProps) => {
   const { classes } = useRepresentationNavigationStyles();
+
+  const { workbenchState, setWorkbenchState, updateWorkbenchPart } = useWorkbenchState();
+  useEffect(() => {
+    updateWorkbenchPart(partId);
+    return () => {
+      delete workbenchState.parts[partId];
+    };
+  }, [partId]);
 
   const onChange = (_event: React.ChangeEvent<{}>, value: string) => {
     const representationSelected = representations.find((representation) => representation.id === value);
@@ -75,6 +86,10 @@ export const RepresentationNavigation = ({
       };
       onRepresentationClick(representation);
     }
+    setWorkbenchState({
+      ...workbenchState,
+      focus: representationSelected?.id,
+    });
   };
 
   const onRepresentationClose = (event: React.MouseEvent<SVGSVGElement>, representation: RepresentationMetadata) => {

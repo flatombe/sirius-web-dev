@@ -29,49 +29,52 @@ const isDiagramRefreshedEventPayload = (
   payload: GQLDiagramEventPayload | null
 ): payload is GQLDiagramRefreshedEventPayload => !!payload && payload.__typename === 'DiagramRefreshedEventPayload';
 
-export const DiagramSubscriptionProvider = memo(({ diagramId, editingContextId }: DiagramSubscriptionProviderProps) => {
-  const [state, setState] = useState<DiagramSubscriptionState>({
-    id: crypto.randomUUID(),
-    diagramRefreshedEventPayload: null,
-    complete: false,
-    message: '',
-  });
+export const DiagramSubscriptionProvider = memo(
+  ({ diagramId, editingContextId, partId }: DiagramSubscriptionProviderProps) => {
+    const [state, setState] = useState<DiagramSubscriptionState>({
+      id: crypto.randomUUID(),
+      diagramRefreshedEventPayload: null,
+      complete: false,
+      message: '',
+    });
 
-  const { complete, payload } = useDiagramSubscription(editingContextId, diagramId);
+    const { complete, payload } = useDiagramSubscription(editingContextId, diagramId);
 
-  useEffect(() => {
-    if (isDiagramRefreshedEventPayload(payload)) {
-      setState((prevState) => ({ ...prevState, diagramRefreshedEventPayload: payload }));
+    useEffect(() => {
+      if (isDiagramRefreshedEventPayload(payload)) {
+        setState((prevState) => ({ ...prevState, diagramRefreshedEventPayload: payload }));
+      }
+    }, [payload]);
+
+    if (complete) {
+      return (
+        <div>
+          <Typography variant="subtitle2">The representation is not available anymore</Typography>
+        </div>
+      );
     }
-  }, [payload]);
 
-  if (complete) {
+    if (!state.diagramRefreshedEventPayload) {
+      return <RepresentationLoadingIndicator />;
+    }
+
     return (
-      <div>
-        <Typography variant="subtitle2">The representation is not available anymore</Typography>
-      </div>
+      <StoreContextProvider>
+        <DialogContextProvider>
+          <ImpactAnalysisDialogContextProvider>
+            <div
+              style={{ display: 'inline-block', position: 'relative' }}
+              data-representation-kind="diagram"
+              data-representation-label={state.diagramRefreshedEventPayload.diagram.metadata.label}>
+              <DiagramRenderer
+                key={state.diagramRefreshedEventPayload.diagram.id}
+                diagramRefreshedEventPayload={state.diagramRefreshedEventPayload}
+                partId={partId}
+              />
+            </div>
+          </ImpactAnalysisDialogContextProvider>
+        </DialogContextProvider>
+      </StoreContextProvider>
     );
   }
-
-  if (!state.diagramRefreshedEventPayload) {
-    return <RepresentationLoadingIndicator />;
-  }
-
-  return (
-    <StoreContextProvider>
-      <DialogContextProvider>
-        <ImpactAnalysisDialogContextProvider>
-          <div
-            style={{ display: 'inline-block', position: 'relative' }}
-            data-representation-kind="diagram"
-            data-representation-label={state.diagramRefreshedEventPayload.diagram.metadata.label}>
-            <DiagramRenderer
-              key={state.diagramRefreshedEventPayload.diagram.id}
-              diagramRefreshedEventPayload={state.diagramRefreshedEventPayload}
-            />
-          </div>
-        </ImpactAnalysisDialogContextProvider>
-      </DialogContextProvider>
-    </StoreContextProvider>
-  );
-});
+);
