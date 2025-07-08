@@ -10,7 +10,11 @@
  * Contributors:
  *     Obeo - initial API and implementation
  *******************************************************************************/
-import { IconOverlay, WorkbenchViewComponentProps } from '@eclipse-sirius/sirius-components-core';
+import {
+  IconOverlay,
+  WorkbenchViewComponentProps,
+  WorkbenchViewConfigurationSupplier,
+} from '@eclipse-sirius/sirius-components-core';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
@@ -23,9 +27,14 @@ import { SxProps, Theme, useTheme } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { ComponentType } from 'react';
+import { ComponentType, ForwardedRef, forwardRef, useImperativeHandle } from 'react';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
-import { ExpressionAreaProps, ExpressionResultViewerProps, ResultAreaProps } from './QueryView.types';
+import {
+  ExpressionAreaProps,
+  ExpressionResultViewerProps,
+  QueryViewConfiguration,
+  ResultAreaProps,
+} from './QueryView.types';
 import { useEvaluateExpression } from './useEvaluateExpression';
 import {
   GQLBooleanExpressionResult,
@@ -38,33 +47,65 @@ import {
 import { useExpression } from './useExpression';
 import { useResultAreaSize } from './useResultAreaSize';
 
-export const QueryView = ({ editingContextId, readOnly }: WorkbenchViewComponentProps) => {
-  const queryViewStyle: SxProps<Theme> = (theme) => ({
-    display: 'flex',
-    flexDirection: 'column',
-    gap: theme.spacing(2),
-    paddingX: theme.spacing(1),
-  });
+export const QueryView = forwardRef<WorkbenchViewConfigurationSupplier, WorkbenchViewComponentProps>(
+  (
+    { editingContextId, readOnly, initialConfiguration }: WorkbenchViewComponentProps,
+    queryViewConfigurationSupplierRef: ForwardedRef<WorkbenchViewConfigurationSupplier>
+  ) => {
+    const initialQueryViewConfiguration: QueryViewConfiguration = initialConfiguration as QueryViewConfiguration;
+    const initialQueryText = initialQueryViewConfiguration.queryText;
 
-  const { evaluateExpression, loading, result } = useEvaluateExpression();
-  const handleEvaluateExpression = (expression: string) => evaluateExpression(editingContextId, expression);
+    const queryViewStyle: SxProps<Theme> = (theme) => ({
+      display: 'flex',
+      flexDirection: 'column',
+      gap: theme.spacing(2),
+      paddingX: theme.spacing(1),
+    });
 
-  const { ref, width, height } = useResultAreaSize();
+    const { expression } = useExpression(editingContextId, initialQueryText);
 
-  return (
-    <Box data-representation-kind="query" sx={queryViewStyle} ref={ref}>
-      <ExpressionArea
-        editingContextId={editingContextId}
-        onEvaluateExpression={handleEvaluateExpression}
-        disabled={loading || readOnly}
-      />
-      <ResultArea loading={loading} payload={result} width={width} height={height} />
-    </Box>
-  );
-};
+    useImperativeHandle(
+      queryViewConfigurationSupplierRef,
+      () => {
+        return {
+          getWorkbenchViewConfiguration: () => {
+            return {
+              id: null,
+              isActive: null,
+              queryText: expression,
+            };
+          },
+        };
+      },
+      [expression]
+    );
 
-const ExpressionArea = ({ editingContextId, onEvaluateExpression, disabled }: ExpressionAreaProps) => {
-  const { expression, onExpressionChange } = useExpression(editingContextId);
+    const { evaluateExpression, loading, result } = useEvaluateExpression();
+    const handleEvaluateExpression = (expression: string) => evaluateExpression(editingContextId, expression);
+
+    const { ref, width, height } = useResultAreaSize();
+
+    return (
+      <Box data-representation-kind="query" sx={queryViewStyle} ref={ref}>
+        <ExpressionArea
+          editingContextId={editingContextId}
+          onEvaluateExpression={handleEvaluateExpression}
+          disabled={loading || readOnly}
+          initialQueryText={initialQueryText}
+        />
+        <ResultArea loading={loading} payload={result} width={width} height={height} />
+      </Box>
+    );
+  }
+);
+
+const ExpressionArea = ({
+  editingContextId,
+  onEvaluateExpression,
+  disabled,
+  initialQueryText,
+}: ExpressionAreaProps) => {
+  const { expression, onExpressionChange } = useExpression(editingContextId, initialQueryText);
 
   const expressionAreaToolbarStyle: SxProps<Theme> = {
     display: 'flex',

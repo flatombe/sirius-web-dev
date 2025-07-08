@@ -59,6 +59,7 @@ export const WorkbenchPart = ({
   const { classes } = useSiteStyles();
 
   const { title, icon, component: Component } = contribution;
+  contribution.ref = contribution.createRef();
   return (
     <div className={classes.view} data-testid={`site-${side}`}>
       <div className={classes.viewHeader}>
@@ -70,6 +71,7 @@ export const WorkbenchPart = ({
           editingContextId={editingContextId}
           readOnly={readOnly}
           initialConfiguration={initialConfiguration}
+          ref={contribution.ref}
         />
       </div>
     </div>

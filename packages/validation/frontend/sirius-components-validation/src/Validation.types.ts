@@ -10,7 +10,13 @@
  * Contributors:
  *     Obeo - initial API and implementation
  *******************************************************************************/
+import { WorkbenchViewConfiguration, WorkbenchViewConfigurationSupplier } from '@eclipse-sirius/sirius-components-core';
 import { GQLValidation } from './useValidationViewSubscription.types';
 export interface ValidationRepresentationState {
   validationPayload: GQLValidation | null;
 }
+export interface ValidationViewConfigurationSupplier extends WorkbenchViewConfigurationSupplier {
+  getWorkbenchViewConfiguration: () => ValidationViewConfiguration | null;
+}
+
+export interface ValidationViewConfiguration extends WorkbenchViewConfiguration {}
