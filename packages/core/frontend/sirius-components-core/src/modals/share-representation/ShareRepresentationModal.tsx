@@ -16,8 +16,8 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useContext } from 'react';
-import { RepresentationPathContext } from '../../contexts/RepresentationPathContext';
-import { RepresentationPathContextValue } from '../../contexts/RepresentationPathContext.types';
+import { EditProjectViewPathContext } from '../../contexts/EditProjectViewPathContext';
+import { EditProjectViewPathContextValue } from '../../contexts/EditProjectViewPathContext.types';
 import { ShareRepresentationModalProps } from './ShareRepresentationModal.types';
 
 export const ShareRepresentationModal = ({ representationId, onClose }: ShareRepresentationModalProps) => {
@@ -33,12 +33,12 @@ export const ShareRepresentationModal = ({ representationId, onClose }: ShareRep
     }
   };
 
-  const { getRepresentationPath } = useContext<RepresentationPathContextValue>(RepresentationPathContext);
-  const path: string = window.location.origin + getRepresentationPath(representationId);
+  const { generatePathToEditProjectView } = useContext<EditProjectViewPathContextValue>(EditProjectViewPathContext);
+  const url: string = window.location.origin + generatePathToEditProjectView(representationId);
 
   let title = 'Shareable link';
   if (navigator.clipboard && document.hasFocus()) {
-    navigator.clipboard.writeText(path);
+    navigator.clipboard.writeText(url);
     title += ' (copied into the clipboard)';
   }
 
@@ -46,7 +46,7 @@ export const ShareRepresentationModal = ({ representationId, onClose }: ShareRep
     <Dialog open onClose={onClose} aria-labelledby="dialog-title" fullWidth>
       <DialogTitle>{title}</DialogTitle>
       <DialogContent ref={refCallback}>
-        <DialogContentText>{path}</DialogContentText>
+        <DialogContentText>{url}</DialogContentText>
       </DialogContent>
     </Dialog>
   );

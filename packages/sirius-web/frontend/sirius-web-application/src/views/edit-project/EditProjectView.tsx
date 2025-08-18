@@ -12,8 +12,8 @@
  *******************************************************************************/
 
 import {
+  EditProjectViewPathContext,
   RepresentationMetadata,
-  RepresentationPathContext,
   Selection,
   SelectionContextProvider,
   SelectionEntry,
@@ -30,7 +30,12 @@ import {
 import { RefObject, useEffect, useRef, useState } from 'react';
 import { Navigate, useParams, useSearchParams } from 'react-router-dom';
 import { makeStyles } from 'tss-react/mui';
-import { EditProjectViewParams, EditProjectViewState, TreeToolBarProviderProps } from './EditProjectView.types';
+import {
+  EditProjectViewComponentProps,
+  EditProjectViewParams,
+  EditProjectViewState,
+  TreeToolBarProviderProps,
+} from './EditProjectView.types';
 import { EditProjectNavbar } from './navbar/EditProjectNavbar';
 import { ProjectContext } from './ProjectContext';
 import { SelectionSynchronizer } from './SelectionSynchronizer';
@@ -52,18 +57,27 @@ const useEditProjectViewStyles = makeStyles()((_) => ({
   },
 }));
 
-export const EditProjectView = () => {
-  const { projectId: rawProjectId, representationId } = useParams<EditProjectViewParams>();
+export const EditProjectView = ({ getEditProjectViewPathTo }: EditProjectViewComponentProps) => {
+  const { projectIdAndSemanticDataName, representationId } = useParams<EditProjectViewParams>();
   const { classes } = useEditProjectViewStyles();
   const [urlSearchParams, setSearchParams] = useSearchParams();
 
-  const separatorIndex = rawProjectId.indexOf(PROJECT_ID_SEPARATOR);
-  const projectId: string = separatorIndex !== -1 ? rawProjectId.substring(0, separatorIndex) : rawProjectId;
-  const name: string | null =
-    separatorIndex !== -1 ? rawProjectId.substring(separatorIndex + 1, rawProjectId.length) : null;
+  const separatorIndex = projectIdAndSemanticDataName.indexOf(PROJECT_ID_SEPARATOR);
+  const projectId: string =
+    separatorIndex !== -1 ? projectIdAndSemanticDataName.substring(0, separatorIndex) : projectIdAndSemanticDataName;
+  const semanticDataName: string | null =
+    separatorIndex !== -1
+      ? projectIdAndSemanticDataName.substring(separatorIndex + 1, projectIdAndSemanticDataName.length)
+      : null;
   const workbenchConfiguration: WorkbenchConfiguration | null = urlSearchParams.has('workbenchConfiguration')
     ? JSON.parse(urlSearchParams.get('workbenchConfiguration'))
     : null;
+
+  const editProjectViewPathContextValue = {
+    generatePathToEditProjectView(representationId: string) {
+      return getEditProjectViewPathTo(projectId, semanticDataName, representationId);
+    },
+  };
 
   const [state, setState] = useState<EditProjectViewState>({
     project: null,
@@ -78,7 +92,7 @@ export const EditProjectView = () => {
     }
   }, [urlSearchParams]);
 
-  const { data, loading } = useProjectAndRepresentationMetadata(projectId, name, representationId);
+  const { data, loading } = useProjectAndRepresentationMetadata(projectId, semanticDataName, representationId);
   useEffect(() => {
     if (data) {
       const { project } = data.viewer;
@@ -112,17 +126,12 @@ export const EditProjectView = () => {
 
   useSynchronizeSelectionAndURL(
     projectId,
-    name,
+    semanticDataName,
     representationId,
     state.project ? state.project.id : null,
     state.representation ? state.representation.id : null,
     !state.project
   );
-
-  const getRepresentationPath = (representationId: string) => {
-    // Note that this should match the corresponding route configuration
-    return `/projects/${projectId}/edit/${representationId}`;
-  };
 
   const isMissing = !loading && (!data || !data.viewer.project || !data.viewer.project.currentEditingContext);
   if (isMissing) {
@@ -140,7 +149,7 @@ export const EditProjectView = () => {
       <ProjectContext.Provider value={{ project: state.project }}>
         <SelectionContextProvider initialSelection={initialSelection}>
           <SelectionSynchronizer>
-            <RepresentationPathContext.Provider value={{ getRepresentationPath }}>
+            <EditProjectViewPathContext.Provider value={editProjectViewPathContextValue}>
               <OmniboxProvider editingContextId={state.project.currentEditingContext.id}>
                 <UndoRedo>
                   <EditProjectNavbar workbenchHandle={refWorkbenchHandle.current} />
@@ -156,7 +165,7 @@ export const EditProjectView = () => {
                   </TreeToolBarProvider>
                 </UndoRedo>
               </OmniboxProvider>
-            </RepresentationPathContext.Provider>
+            </EditProjectViewPathContext.Provider>
           </SelectionSynchronizer>
         </SelectionContextProvider>
       </ProjectContext.Provider>

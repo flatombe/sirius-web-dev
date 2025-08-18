@@ -11,6 +11,11 @@
  *     Obeo - initial API and implementation
  *******************************************************************************/
 
-export interface RepresentationPathContextValue {
-  getRepresentationPath(representationId: string): string;
-}
+import React from 'react';
+import { EditProjectViewPathContextValue } from './EditProjectViewPathContext.types';
+
+const value: EditProjectViewPathContextValue = {
+  generatePathToEditProjectView: () => '',
+};
+
+export const EditProjectViewPathContext = React.createContext<EditProjectViewPathContextValue>(value);

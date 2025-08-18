@@ -11,16 +11,20 @@
  *     Obeo - initial API and implementation
  *******************************************************************************/
 
-import { useSelection } from '@eclipse-sirius/sirius-components-core';
+import {
+  EditProjectViewPathContext,
+  EditProjectViewPathContextValue,
+  useSelection,
+} from '@eclipse-sirius/sirius-components-core';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import { generatePath } from 'react-router-dom';
+import { useContext } from 'react';
 import { selectionToSearchParamsValue } from '../../SelectionSynchronizer';
 import { ShareProjectModalProps } from './ShareProjectModal.types';
 
-export const ShareProjectModal = ({ projectId, workbenchConfiguration, onClose }: ShareProjectModalProps) => {
+export const ShareProjectModal = ({ workbenchConfiguration, onClose }: ShareProjectModalProps) => {
   const refCallback = (node: HTMLElement) => {
     if (node !== null) {
       var range = document.createRange();
@@ -33,6 +37,8 @@ export const ShareProjectModal = ({ projectId, workbenchConfiguration, onClose }
     }
   };
 
+  const { generatePathToEditProjectView } = useContext<EditProjectViewPathContextValue>(EditProjectViewPathContext);
+
   const { selection } = useSelection();
   const searchParams: URLSearchParams = new URLSearchParams({
     workbenchConfiguration: JSON.stringify(workbenchConfiguration),
@@ -43,20 +49,12 @@ export const ShareProjectModal = ({ projectId, workbenchConfiguration, onClose }
     workbenchConfiguration.mainPanel?.representationEditors.find((configuration) => configuration.isActive)
       ?.representationId ?? null;
 
-  let path: string;
-  const origin = window.location.origin;
-  if (representationId) {
-    path =
-      generatePath(':origin/projects/:projectId/edit/:representationId', { origin, projectId, representationId }) +
-      '?' +
-      searchParams.toString();
-  } else {
-    path = generatePath(':origin/projects/:projectId/edit', { origin, projectId }) + '?' + searchParams.toString();
-  }
+  const path = generatePathToEditProjectView(representationId);
+  const url = window.location.origin + path + '?' + searchParams.toString();
 
   let title = 'Shareable link';
   if (navigator.clipboard && document.hasFocus()) {
-    navigator.clipboard.writeText(path);
+    navigator.clipboard.writeText(url);
     title += ' (copied into the clipboard)';
   }
 
@@ -64,7 +62,7 @@ export const ShareProjectModal = ({ projectId, workbenchConfiguration, onClose }
     <Dialog open onClose={onClose} aria-labelledby="dialog-title" fullWidth>
       <DialogTitle>{title}</DialogTitle>
       <DialogContent ref={refCallback}>
-        <DialogContentText data-testid="share-path">{path}</DialogContentText>
+        <DialogContentText data-testid="share-path">{url}</DialogContentText>
       </DialogContent>
     </Dialog>
   );

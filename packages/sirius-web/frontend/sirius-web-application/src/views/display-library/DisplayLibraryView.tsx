@@ -10,7 +10,11 @@
  * Contributors:
  *     Obeo - initial API and implementation
  *******************************************************************************/
-import { RepresentationPathContext, SelectionContextProvider, Workbench } from '@eclipse-sirius/sirius-components-core';
+import {
+  EditProjectViewPathContext,
+  SelectionContextProvider,
+  Workbench,
+} from '@eclipse-sirius/sirius-components-core';
 import { Navigate, useParams } from 'react-router-dom';
 import { makeStyles } from 'tss-react/mui';
 import { NavigationBar } from '../../navigationBar/NavigationBar';
@@ -37,10 +41,11 @@ export const DisplayLibraryView = () => {
     decodeURIComponent(version ?? '')
   );
 
-  const getRepresentationPath = (representationId: string) => {
-    // Note that this should match the corresponding route configuration
-    return `/libraries/${namespace}/${name}/${version}/edit/${representationId}`;
-  };
+  // TODO: a bit like in EditProjectView.tsx
+  // const getRepresentationPath = (representationId: string) => {
+  //   // Note that this should match the corresponding route configuration
+  //   return `/libraries/${namespace}/${name}/${version}/edit/${representationId}`;
+  // };
 
   if (data && !data.viewer.library) {
     return <Navigate to="/errors/404" replace />;
@@ -50,7 +55,15 @@ export const DisplayLibraryView = () => {
     <div className={classes.displayLibraryView}>
       {loading ? <NavigationBar /> : null}
       {data && data.viewer.library ? (
-        <RepresentationPathContext.Provider value={{ getRepresentationPath }}>
+        <EditProjectViewPathContext.Provider
+          value={{
+            generatePathToEditProjectView(representationId: string) {
+              representationId;
+              return '';
+              // TODO: a bit like in EditProjectView.tsx
+              // return getEditProjectViewPathTo(projectId, semanticDataName, representationId);
+            },
+          }}>
           <SelectionContextProvider initialSelection={{ entries: [] }}>
             <DisplayLibraryNavbar library={data.viewer.library} />
             <Workbench
@@ -62,7 +75,7 @@ export const DisplayLibraryView = () => {
               ref={null}
             />
           </SelectionContextProvider>
-        </RepresentationPathContext.Provider>
+        </EditProjectViewPathContext.Provider>
       ) : null}
       ;
     </div>

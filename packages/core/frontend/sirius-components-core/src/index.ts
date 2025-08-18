@@ -11,8 +11,8 @@
  *     Obeo - initial API and implementation
  *******************************************************************************/
 export * from './color/getCSSColor';
-export * from './contexts/RepresentationPathContext';
-export type * from './contexts/RepresentationPathContext.types';
+export * from './contexts/EditProjectViewPathContext';
+export type * from './contexts/EditProjectViewPathContext.types';
 export * from './contexts/ServerContext';
 export type * from './contexts/ServerContext.types';
 export * from './contexts/ToastContext';

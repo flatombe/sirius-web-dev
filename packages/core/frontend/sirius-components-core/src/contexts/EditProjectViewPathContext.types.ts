@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2024 Obeo.
+ * Copyright (c) 2024, 2025 Obeo.
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -11,11 +11,6 @@
  *     Obeo - initial API and implementation
  *******************************************************************************/
 
-import React from 'react';
-import { RepresentationPathContextValue } from './RepresentationPathContext.types';
-
-const value: RepresentationPathContextValue = {
-  getRepresentationPath: () => '',
-};
-
-export const RepresentationPathContext = React.createContext<RepresentationPathContextValue>(value);
+export interface EditProjectViewPathContextValue {
+  generatePathToEditProjectView(representationId?: string): string;
+}

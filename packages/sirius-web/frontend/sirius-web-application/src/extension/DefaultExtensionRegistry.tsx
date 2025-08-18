@@ -80,7 +80,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import TableViewIcon from '@mui/icons-material/TableView';
 import WarningIcon from '@mui/icons-material/Warning';
-import { Navigate, PathRouteProps, useMatch } from 'react-router-dom';
+import { Navigate, PathRouteProps, generatePath, useMatch } from 'react-router-dom';
 import { DiagramFilter } from '../diagrams/DiagramFilter';
 import { SiriusWebManageVisibilityNodeAction } from '../diagrams/nodeaction/SiriusWebManageVisibilityNodeAction';
 import { ApolloLinkUndoRedoStack } from '../graphql/ApolloLinkUndoRedoStack';
@@ -517,6 +517,19 @@ defaultExtensionRegistry.putData<OmniboxCommandOverrideContribution[]>(
  * Used to register the route of Sirius Web views
  *
  *******************************************************************************/
+// Note that this should match the corresponding route configuration
+const editProjectViewPathGenerator: (
+  projectId: string,
+  semanticDataName?: string,
+  representationId?: string
+) => string = (projectId, semanticDataName = null, representationId = null) => {
+  const path = generatePath('/projects/:projectIdAndSemanticDataName/edit/:representationId?', {
+    projectIdAndSemanticDataName: `${projectId}${semanticDataName ? '@' + semanticDataName : ''}`,
+    representationId,
+  });
+
+  return path;
+};
 
 export const siriusWebRouterContributions: PathRouteProps[] = [
   {
@@ -544,10 +557,10 @@ export const siriusWebRouterContributions: PathRouteProps[] = [
     ),
   },
   {
-    path: '/projects/:projectId/edit/:representationId?/*',
+    path: '/projects/:projectIdAndSemanticDataName/edit/:representationId?/*',
     element: (
       <ViewerContextProvider>
-        <EditProjectView />
+        <EditProjectView getEditProjectViewPathTo={editProjectViewPathGenerator} />
       </ViewerContextProvider>
     ),
   },
